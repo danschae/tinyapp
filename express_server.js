@@ -7,7 +7,7 @@ function generateRandomString() {
   let shortedString = Math.random().toString(36).substring(2,8);
   return shortedString;
 }
-const newString = generateRandomString();
+
 
 app.use(bodyParser.urlencoded({extended: true}));
 
@@ -29,7 +29,9 @@ app.get("/urls/new", (req, res) => {
 });
 
 app.post("/urls", (req, res) => {
-  res.send(newString);
+  let shortened = generateRandomString();
+  urlDatabase[shortened] = req.body.longURL;
+  res.redirect("/urls");
 });
 
 app.get("/urls/:shortURL", (req, res) => {
@@ -37,6 +39,12 @@ app.get("/urls/:shortURL", (req, res) => {
   const templatVars = {shortURL: shortURL, longURL: urlDatabase[shortURL]};
   res.render("urls_show", templatVars);
 });
+
+app.get("/u/:shortURL", (req, res) => {
+  const  shortURL = req.params.shortURL;
+  const longURL = urlDatabase[shortURL];
+  res.redirect(longURL);
+})
 
 app.get("/", (req, res) => {
   res.send("Hello!");
