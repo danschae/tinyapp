@@ -46,7 +46,7 @@ app.get("/u/:shortURL", (req, res) => {
   if(!longURL) {
     res.statusCode = 404;
     res.write("404 - page not found");
-    res.end()
+    res.end();
   } else {
   res.redirect(longURL);
   }
