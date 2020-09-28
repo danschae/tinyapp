@@ -14,6 +14,12 @@ app.get("/urls", (req, res) => {
   res.render("urls_index", templatVars);
 })
 
+app.get("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  const templatVars = {shortURL: shortURL, longURL: urlDatabase[shortURL]};
+  res.render("urls_show", templatVars);
+})
+
 app.get("/", (req, res) => {
   res.send("Hello!");
 });
