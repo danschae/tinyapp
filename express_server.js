@@ -43,7 +43,13 @@ app.get("/urls/:shortURL", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const  shortURL = req.params.shortURL;
   const longURL = urlDatabase[shortURL];
+  if(!longURL) {
+    res.statusCode = 404;
+    res.write("404 - page not found");
+    res.end()
+  } else {
   res.redirect(longURL);
+  }
 })
 
 app.get("/", (req, res) => {
