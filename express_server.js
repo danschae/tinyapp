@@ -1,6 +1,15 @@
 const express = require("express");
 const app = express();
-const PORT = 8080; // default port 8080
+const PORT = 8080;
+const bodyParser = require("body-parser");
+
+function generateRandomString() {
+  let shortedString = Math.random().toString(36).substring(2,8);
+  return shortedString;
+}
+const newString = generateRandomString();
+
+app.use(bodyParser.urlencoded({extended: true}));
 
 app.set('view engine', 'ejs');
 
@@ -12,13 +21,22 @@ const urlDatabase = {
 app.get("/urls", (req, res) => {
   const templatVars = {urls: urlDatabase};
   res.render("urls_index", templatVars);
-})
+});
+
+
+app.get("/urls/new", (req, res) => {
+  res.render("urls_new");
+});
+
+app.post("/urls", (req, res) => {
+  res.send(newString);
+});
 
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const templatVars = {shortURL: shortURL, longURL: urlDatabase[shortURL]};
   res.render("urls_show", templatVars);
-})
+});
 
 app.get("/", (req, res) => {
   res.send("Hello!");
