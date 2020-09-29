@@ -13,7 +13,7 @@ function generateRandomString() {
 // can use bodyparser
 app.use(bodyParser.urlencoded({extended: true}));
 
-// can use cookie parsing
+// can use cookie parsingdfsdfs
 app.use(cookieParser());
 
 app.set('view engine', 'ejs');
