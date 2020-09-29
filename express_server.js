@@ -24,23 +24,46 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+//user information
+const users = {};
+
+//get the user registration page
+app.get("/register", (req, res) => {
+  res.render("sign_in")
+})
+
+//registration post, need to refactor!!!!
+app.post("/register", (req,res) => {
+  let generatedId = generateRandomString();
+  users[generatedId] = {
+    "id" : generatedId,
+    "email": req.body.email,
+    "password": req.body.password
+  };
+  console.log(users)
+  res.cookie("user_id", users[generatedId].id);
+  res.redirect("/urls")
+})
+
 // the method to login and store a cookie
 app.post("/login", (req, res) => {
-  res.cookie("username", req.body.username, {});
-  res.redirect("/urls")
+  res.redirect("/register")
 });
 
 //make it logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("username")
+  res.clearCookie("user_id")
   res.redirect("/urls")
 });
 
 //used to render the index url page
 app.get("/urls", (req, res) => {
+  console.log("test:", req.cookies["user_id"])
+  console.log("name:", users[req.cookies["user_id"]])
   const templatVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    username: req.cookies["user_id"],
+    users: users[req.cookies["user_id"]]
   };
   res.render("urls_index", templatVars);
 });
@@ -49,7 +72,8 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templatVars = {
     urls: urlDatabase,
-    username: req.cookies["username"]
+    username: req.cookies["user_id"],
+    users:users
   };
   res.render("urls_new", templatVars);
 });
@@ -64,10 +88,12 @@ app.post("/urls", (req, res) => {
 //the page for showing and then editing the urls
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const templatVars = {shortURL: shortURL, 
+  const templatVars = {
+    shortURL: shortURL, 
     longURL: urlDatabase[shortURL],
     urls: urlDatabase,
-    username: req.cookies["username"]
+    username: req.cookies["user_id"],
+    users: users
   };
   res.render("urls_show", templatVars);
 });
