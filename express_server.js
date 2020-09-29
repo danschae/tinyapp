@@ -27,7 +27,7 @@ const urlDatabase = {
 //user informationd
 const users = {};
 
-//function to sort through emails
+//fudddnction to sort through emails
 const sortObj = (obj, email) => {
   for (const key in obj) {
     if (obj[key].email === email) {
