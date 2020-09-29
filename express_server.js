@@ -47,7 +47,11 @@ app.get("/urls", (req, res) => {
 
 // the page to add a new url
 app.get("/urls/new", (req, res) => {
-  res.render("urls_new");
+  const templatVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
+  res.render("urls_new", templatVars);
 });
 
 // the posting method to add a new url
@@ -60,7 +64,11 @@ app.post("/urls", (req, res) => {
 //the page for showing and then editing the urls
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  const templatVars = {shortURL: shortURL, longURL: urlDatabase[shortURL]};
+  const templatVars = {shortURL: shortURL, 
+    longURL: urlDatabase[shortURL],
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
   res.render("urls_show", templatVars);
 });
 
