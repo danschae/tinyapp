@@ -26,13 +26,22 @@ const urlDatabase = {
 
 // the method to login and store a cookie
 app.post("/login", (req, res) => {
-  res.cookie(req.body, "3", {});
+  res.cookie("username", req.body.username, {});
+  res.redirect("/urls")
+});
+
+//make it logout
+app.post("/logout", (req, res) => {
+  res.clearCookie("username")
   res.redirect("/urls")
 });
 
 //used to render the index url page
 app.get("/urls", (req, res) => {
-  const templatVars = {urls: urlDatabase};
+  const templatVars = {
+    urls: urlDatabase,
+    username: req.cookies["username"]
+  };
   res.render("urls_index", templatVars);
 });
 
