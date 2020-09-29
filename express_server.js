@@ -24,7 +24,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
-//user information
+//user informationd
 const users = {};
 
 //function to sort through emails
