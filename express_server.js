@@ -27,6 +27,18 @@ const urlDatabase = {
 //user information
 const users = {};
 
+//function to sort through emails
+const sortObj = (obj, email) => {
+  for (const key in obj) {
+    if (obj[key].email === email) {
+      return false
+    } else {
+    return true
+    }
+  }
+};
+
+
 //get the user registration page
 app.get("/register", (req, res) => {
   res.render("sign_in")
@@ -40,10 +52,20 @@ app.post("/register", (req,res) => {
     "email": req.body.email,
     "password": req.body.password
   };
-  console.log(users)
+  // check email
+  if (req.body.email.length <= 0 || req.body.password.length <= 0) {
+    res.statusCode = 400;
+    res.write("please fill in everything!");
+    res.end();
+  } else if (sortObj(users, req.body.email) === false) {
+    res.statusCode = 400;
+    res.write("email already exists!");
+    res.end()
+  } else {
   res.cookie("user_id", users[generatedId].id);
   res.redirect("/urls")
-})
+  }
+});
 
 // the method to login and store a cookie
 app.post("/login", (req, res) => {
@@ -58,8 +80,6 @@ app.post("/logout", (req, res) => {
 
 //used to render the index url page
 app.get("/urls", (req, res) => {
-  console.log("test:", req.cookies["user_id"])
-  console.log("name:", users[req.cookies["user_id"]])
   const templatVars = {
     urls: urlDatabase,
     username: req.cookies["user_id"],
@@ -73,7 +93,7 @@ app.get("/urls/new", (req, res) => {
   const templatVars = {
     urls: urlDatabase,
     username: req.cookies["user_id"],
-    users:users
+    users: users[req.cookies["user_id"]]
   };
   res.render("urls_new", templatVars);
 });
@@ -132,10 +152,6 @@ app.get("/", (req, res) => {
 
 app.get("/urls.json", (req, res) => {
   res.json(urlDatabase);
-});
-
-app.get("/hello", (req, res) => {
-  res.send("<html><body>Hello <b>World</b></body></html>\n");
 });
 
 app.listen(PORT, () => {
