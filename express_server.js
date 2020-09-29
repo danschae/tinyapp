@@ -18,6 +18,7 @@ const urlDatabase = {
   "9sm5xK": "http://www.google.com"
 };
 
+
 app.get("/urls", (req, res) => {
   const templatVars = {urls: urlDatabase};
   res.render("urls_index", templatVars);
@@ -38,6 +39,19 @@ app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const templatVars = {shortURL: shortURL, longURL: urlDatabase[shortURL]};
   res.render("urls_show", templatVars);
+});
+
+app.post("/urls/:shortURL", (req, res) => {
+  const shortURL = req.params.shortURL;
+  urlDatabase[shortURL] = req.body.longURL;
+  res.redirect("/urls");
+});
+
+app.post("/urls/:shortURL/delete", (req, res) => {
+  console.log(req.body)
+  const shortURL = req.params.shortURL;
+  delete urlDatabase[shortURL];
+  res.redirect("/urls");
 });
 
 app.get("/u/:shortURL", (req, res) => {
