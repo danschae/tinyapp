@@ -18,7 +18,7 @@ app.use(cookieParser());
 
 app.set('view engine', 'ejs');
 
-//object containing all the saved urls
+//object containing all the saved urlsear
 const urlDatabase = {
   "b2xVn2": "http://www.lighthouselabs.ca",
   "9sm5xK": "http://www.google.com"
