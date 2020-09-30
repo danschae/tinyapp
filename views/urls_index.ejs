@@ -22,14 +22,14 @@
         </tr>
       </thead>
       <tbody>
-        <% for(let url in urls) { %>
+        <% for (const url in newDatabase) { %>
           <tr>
             <td><%= url %></td>
-            <td><%= urls[url].longURL %></td>
+            <td><%= newDatabase[url].longURL %></td>
             <td><input type="button" onclick="location.href='http://localhost:8080/urls/<%= url %>';" value="Edit URL" /></td>
             <td><form method="POST" action="/urls/<%=url%>/delete"><button type="submit">Delete</button></form></td>
           </tr>
-        <% } %>
+        <% }%>
       </tbody>
     </table>
   </main>

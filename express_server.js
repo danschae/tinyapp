@@ -64,7 +64,19 @@ const findID = (obj, email) => {
       return undefined
     }
   }
+};
+
+const findURL = (obj, id) => {
+  const emptyObj = {};
+  for (const key in obj) {
+    if (obj[key].userID === id) {
+      emptyObj[key] = obj[key]
+    } 
+  }
+  return emptyObj
 }
+
+
 
 //get the user registration page
 app.get("/register", (req, res) => {
@@ -81,7 +93,6 @@ app.get("/sign_in", (req, res) => {
     username: req.cookies["user_id"],
     // users: users[req.cookies["user_id"]]
   };
-  console.log(templatVars)
   res.render("log_in",templatVars)
 })
 
@@ -145,11 +156,18 @@ app.post("/logout", (req, res) => {
 
 //used to render the index url page
 app.get("/urls", (req, res) => {
+  const newDatabase = findURL(urlDatabase, req.cookies["user_id"]);
   const templatVars = {
-    urls: urlDatabase,
+    findURL,
+    urls: urlDatabase, 
     username: req.cookies["user_id"],
-    users: users[req.cookies["user_id"]]
+    users: users[req.cookies["user_id"]],
+    newDatabase
   };
+    if (!templatVars.username) {
+      return res.redirect("/sign_in")
+    } 
+
   res.render("urls_index", templatVars);
 });
 
@@ -160,6 +178,7 @@ app.get("/urls/new", (req, res) => {
     username: req.cookies["user_id"],
     users: users[req.cookies["user_id"]]
   };
+  const userId = req.cookies["user_id"];
   if (!templatVars.username) {
     return res.redirect("/urls")
   }
@@ -173,7 +192,7 @@ app.post("/urls", (req, res) => {
     "longURL": req.body.longURL,
     "userID" : req.cookies["user_id"]
   }
-  console.log(urlDatabase)
+  console.log("DATABSE HERE =>", urlDatabase)
   res.redirect("/urls");
 });
 
@@ -193,14 +212,18 @@ app.get("/urls/:shortURL", (req, res) => {
 // the posting method for editing the long url
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
+  if (urlDatabase[shortURL]["userID"] === req.cookies["user_id"]){
   urlDatabase[shortURL].longURL = req.body.longURL;
+  }
   res.redirect("/urls");
 });
 
 // the posting method for deleting a url
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
+  if (urlDatabase[shortURL]["userID"] === req.cookies["user_id"]) {
   delete urlDatabase[shortURL];
+  }
   res.redirect("/urls");
 });
 
