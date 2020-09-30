@@ -29,10 +29,7 @@ app.use(cookieSession({
 app.set('view engine', 'ejs');
 
 //object containing all the saved urlsear
-const urlDatabase = {
-  "b2xVn2": "http://www.lighthouselabs.ca",
-  "9sm5xK": "http://www.google.com"
-};
+const urlDatabase = {}
 
 //user informationd
 const users = {};
@@ -127,7 +124,6 @@ app.post("/sign_in", (req, res) => {
     } 
   }
   res.cookie("user_id", findID(users, req.body.email).id);
-  console.log("TEMPLATE VARS =>", req.cookies["user_id"])
   res.redirect("/urls")
 })
 
@@ -164,13 +160,20 @@ app.get("/urls/new", (req, res) => {
     username: req.cookies["user_id"],
     users: users[req.cookies["user_id"]]
   };
+  if (!templatVars.username) {
+    return res.redirect("/urls")
+  }
   res.render("urls_new", templatVars);
 });
 
 // the posting method to add a new url
 app.post("/urls", (req, res) => {
   let shortened = generateRandomString();
-  urlDatabase[shortened] = req.body.longURL;
+  urlDatabase[shortened] = {
+    "longURL": req.body.longURL,
+    "userID" : req.cookies["user_id"]
+  }
+  console.log(urlDatabase)
   res.redirect("/urls");
 });
 
@@ -178,8 +181,8 @@ app.post("/urls", (req, res) => {
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   const templatVars = {
-    shortURL: shortURL, 
-    longURL: urlDatabase[shortURL],
+    shortURL: req.params.shortURL,
+    longurl: urlDatabase[shortURL].longURL,
     urls: urlDatabase,
     username: req.cookies["user_id"],
     users: users
@@ -190,7 +193,7 @@ app.get("/urls/:shortURL", (req, res) => {
 // the posting method for editing the long url
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  urlDatabase[shortURL] = req.body.longURL;
+  urlDatabase[shortURL].longURL = req.body.longURL;
   res.redirect("/urls");
 });
 
@@ -204,7 +207,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // the ability to reach a website by using its shortURL form
 app.get("/u/:shortURL", (req, res) => {
   const  shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL];
+  const longURL = urlDatabase[shortURL].longURL;
   if(!longURL) {
     res.statusCode = 404;
     res.write("404 - page not found");
