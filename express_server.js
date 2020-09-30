@@ -47,7 +47,7 @@ const checkEmailExists = (obj, email) => {
     }
   }
 };
-
+// Function to check password
 const checkPassword = (obj, password) => {
   for (const key in obj) {
     if (bcrpyt.compareSync(password, obj[key].password) === true) {
@@ -58,6 +58,16 @@ const checkPassword = (obj, password) => {
   }
 };
 
+//function that returns
+const findID = (obj, email) => {
+  for (const key in obj) {
+    if (obj[key].email === email) {
+      return obj[key]
+    } else{
+      return undefined
+    }
+  }
+}
 
 //get the user registration page
 app.get("/register", (req, res) => {
@@ -71,10 +81,10 @@ app.get("/register", (req, res) => {
 //get to sign in page
 app.get("/sign_in", (req, res) => {
   const templatVars = {
-    urls: urlDatabase,
     username: req.cookies["user_id"],
-    users: users[req.cookies["user_id"]]
+    // users: users[req.cookies["user_id"]]
   };
+  console.log(templatVars)
   res.render("log_in",templatVars)
 })
 
@@ -116,7 +126,8 @@ app.post("/sign_in", (req, res) => {
       return res.send("information is incorrect")
     } 
   }
-  res.cookie("user_id", users[req.cookies["user_id"]]);
+  res.cookie("user_id", findID(users, req.body.email).id);
+  console.log("TEMPLATE VARS =>", req.cookies["user_id"])
   res.redirect("/urls")
 })
 
