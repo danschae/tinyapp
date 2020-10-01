@@ -2,22 +2,22 @@ const express = require("express");
 const app = express();
 const PORT = 8080;
 const bodyParser = require("body-parser");
-const cookieParser = require("cookie-parser");
 const cookieSession = require("cookie-session");
 const bcrpyt = require("bcrypt");
 const salt = bcrpyt.genSaltSync(10);
+const {
+  checkEmailExists,
+  generateRandomString,
+  findURL,
+  findID,
+  checkPassword,
+  getUserByEmail
+} = require("./helper");
 
-//global function for generating a random string for the shorturl
-function generateRandomString() {
-  let shortedString = Math.random().toString(36).substring(2,8);
-  return shortedString;
-}
 
 // can use bodyparser
 app.use(bodyParser.urlencoded({extended: true}));
 
-// // can use cookie parsingdfsdfs
-// app.use(cookieParser());
 
 //implementing cookiesession
 
@@ -33,50 +33,6 @@ const urlDatabase = {}
 
 //user informationd
 const users = {};
-
-//function to sort through emails
-const checkEmailExists = (obj, email) => {
-  for (const key in obj) {
-    if (obj[key].email === email) {
-      return true
-    } else {
-    return false
-    }
-  }
-};
-// Function to check password
-const checkPassword = (obj, password) => {
-  for (const key in obj) {
-    if (bcrpyt.compareSync(password, obj[key].password) === true) {
-      return true;
-    } else {
-      return false;
-    }
-  }
-};
-
-//function that returns
-const findID = (obj, email) => {
-  for (const key in obj) {
-    if (obj[key].email === email) {
-      return obj[key]
-    } else{
-      return undefined
-    }
-  }
-};
-
-const findURL = (obj, id) => {
-  const emptyObj = {};
-  for (const key in obj) {
-    if (obj[key].userID === id) {
-      emptyObj[key] = obj[key]
-    } 
-  }
-  return emptyObj
-}
-
-
 
 //get the user registration page
 app.get("/register", (req, res) => {
@@ -232,13 +188,13 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // the ability to reach a website by using its shortURL form
 app.get("/u/:shortURL", (req, res) => {
   const  shortURL = req.params.shortURL;
-  const longURL = urlDatabase[shortURL].longURL;
-  if(!longURL) {
+  const longurl = urlDatabase[shortURL].longURL;
+  if(!longurl) {
     res.statusCode = 404;
     res.write("404 - page not found");
     res.end();
   } else {
-  res.redirect(longURL);
+  res.redirect(longurl);
   }
 })
 
