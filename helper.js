@@ -5,11 +5,11 @@ const checkEmailExists = (obj, email) => {
   for (const key in obj) {
     if (obj[key].email === email) {
       return true
-    } else {
-    return false
+    } 
     }
-  }
-};
+    return false
+  };
+
 // Function to check password
 const checkPassword = (obj, password) => {
   for (const key in obj) {
@@ -26,11 +26,11 @@ const findID = (obj, email) => {
   for (const key in obj) {
     if (obj[key].email === email) {
       return obj[key].id
-    } else{
-      return undefined
+    } 
     }
+    return undefined
   }
-};
+
 
 const findURL = (obj, id) => {
   const emptyObj = {};

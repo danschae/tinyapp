@@ -11,8 +11,7 @@ const {
   findURL,
   findID,
   checkPassword,
-  getUserByEmail
-} = require("./helper");
+} = require("./helper"); // list of helper functions, check helper.js in the same folder to see more
 
 
 // can use bodyparser
@@ -20,16 +19,15 @@ app.use(bodyParser.urlencoded({extended: true}));
 
 
 //implementing cookiesession
-
 app.use(cookieSession({
   name: 'session',
-  keys: ["checkefesfdk", "key2"]
-}))
+  keys: ["checkef3423242ffdesfdk", "32523523jdsfsdfs"]
+}));
 
 app.set('view engine', 'ejs');
 
 //object containing all the saved urlsear
-const urlDatabase = {}
+const urlDatabase = {};
 
 //user informationd
 const users = {};
@@ -41,24 +39,25 @@ app.get("/register", (req, res) => {
     username: req.session.user_id,
     users: users[req.session.user_id]
   };
-  res.render("register",templatVars)
-})
+  res.render("register",templatVars);
+});
+
 //get to sign in page
 app.get("/sign_in", (req, res) => {
   const templatVars = {
     username: req.session.user_id,
     // users: users[req.cookies["user_id"]]
   };
-  res.render("log_in",templatVars)
-})
+  res.render("log_in",templatVars);
+});
 
-//registration post, need to refactor!!!!
+//registration post
 app.post("/register", (req,res) => {
-   // check email
-   if (req.body.email.length <= 0 || req.body.password.length <= 0) {
+  // check email
+  if (req.body.email.length <= 0 || req.body.password.length <= 0) {
     return res.send("please fill in everything!");
-  }  
-   if (checkEmailExists(users, req.body.email)) {
+  }
+  if (checkEmailExists(users, req.body.email)) {
     return res.send("email already exists!");
   }
 
@@ -68,12 +67,10 @@ app.post("/register", (req,res) => {
     "email": req.body.email,
     "password": bcrpyt.hashSync(req.body.password, salt)
   };
- 
+
   // res.cookie("user_id", users[generatedId].id);
-  req.session.user_id =  generatedId
-  res.redirect("/urls")
-  console.log("NEWEST CEHCK *************")
-  console.log(users)
+  req.session.user_id =  generatedId;
+  res.redirect("/urls");
 });
 
 //validating log in
@@ -82,50 +79,47 @@ app.post("/sign_in", (req, res) => {
   if (req.body.email.length <= 0 || req.body.password.length <= 0) {
     return res.send("please fill in everything!");
   }
-  if (!checkEmailExists(users, req.body.email)) {
-    return res.send("information is incorrect!")
+  if (checkEmailExists(users, req.body.email) === false) {
+    return res.send("information is incorrect!");
   }
   if (checkEmailExists(users, req.body.email)) {
     if (!checkPassword(users, req.body.password)) {
-      return res.send("information is incorrect")
-    } 
+      return res.send("information is incorrect");
+    }
   }
-  req.session.user_id = findID(users, req.body.email)
-  res.redirect("/urls")
-})
+  req.session.user_id = findID(users, req.body.email);
+  res.redirect("/urls");
+});
 
 // the method to login and store a cookie
 app.post("/login", (req, res) => {
-  res.redirect("/register")
+  res.redirect("/register");
 });
 
 app.post("/signin", (req, res) => {
-  res.redirect("/sign_in")
+  res.redirect("/sign_in");
 });
 
 
 //make it logout
 app.post("/logout", (req, res) => {
-  req.session.user_id = null
-  res.redirect("/urls")
+  req.session.user_id = null;
+  res.redirect("/urls");
 });
 
 //used to render the index url page
 app.get("/urls", (req, res) => {
   const newDatabase = findURL(urlDatabase, req.session.user_id);
-  console.log("NEW DATABSE_______________");
-  console.log(newDatabase)
   const templatVars = {
     findURL,
-    urls: urlDatabase, 
+    urls: urlDatabase,
     username: req.session.user_id,
     users: users[req.session.user_id],
     newDatabase
   };
-    if (!templatVars.username) {
-      return res.redirect("/sign_in")
-    } 
-
+  if (!templatVars.username) {
+    return res.redirect("/sign_in");
+  }
   res.render("urls_index", templatVars);
 });
 
@@ -137,8 +131,8 @@ app.get("/urls/new", (req, res) => {
     users: users[req.session.user_id]
   };
   if (!templatVars.username) {
-    res.send("must sign in first!")
-    return res.redirect("/urls")
+    res.send("must sign in first!");
+    return res.redirect("/urls");
   }
   res.render("urls_new", templatVars);
 });
@@ -149,8 +143,7 @@ app.post("/urls", (req, res) => {
   urlDatabase[shortened] = {
     "longURL": req.body.longURL,
     "userID" : req.session.user_id
-  }
-  console.log("DATABSE HERE =>", urlDatabase)
+  };
   res.redirect("/urls");
 });
 
@@ -162,7 +155,7 @@ app.get("/urls/:shortURL", (req, res) => {
     longurl: urlDatabase[shortURL].longURL,
     urls: urlDatabase,
     username: req.session.user_id,
-    users: users
+    users: users[req.session.user_id]
   };
   res.render("urls_show", templatVars);
 });
@@ -171,7 +164,7 @@ app.get("/urls/:shortURL", (req, res) => {
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
   if (urlDatabase[shortURL]["userID"] === req.session.user_id) {
-  urlDatabase[shortURL].longURL = req.body.longURL;
+    urlDatabase[shortURL].longURL = req.body.longURL;
   }
   res.redirect("/urls");
 });
@@ -180,7 +173,7 @@ app.post("/urls/:shortURL", (req, res) => {
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
   if (urlDatabase[shortURL]["userID"] === req.session.user_id) {
-  delete urlDatabase[shortURL];
+    delete urlDatabase[shortURL];
   }
   res.redirect("/urls");
 });
@@ -189,16 +182,15 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 app.get("/u/:shortURL", (req, res) => {
   const  shortURL = req.params.shortURL;
   const longurl = urlDatabase[shortURL].longURL;
-  if(!longurl) {
+  if (!longurl) {
     res.statusCode = 404;
     res.write("404 - page not found");
     res.end();
   } else {
-  res.redirect(longurl);
+    res.redirect(longurl);
   }
-})
+});
 
-// for the below ask a mentor!!!!!!!!!!!!!!!!
 app.get("/", (req, res) => {
   res.redirect("/urls");
 });
