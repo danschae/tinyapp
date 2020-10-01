@@ -25,8 +25,8 @@ TinyApp is a full stack web application built with Node and Express that allows 
 
 ## How to Use
 - Must first register or log in.
-- Once logged in, you can shorten any link you want, and by doing http://localhost:8080/u/shortUrl (short URL is the url you shorted), you can access the desired webpage.
+- Once logged in, you can shorten any link you want, and by doing http://localhost:8080/u/shortUrl (short URL is the url you shortened), you can access the desired webpage.
 - You can also edit the long URL for any shortened URL, however you'll need to make sure it's a real URL or otherwise it is useless.
 
 ## IMPORTANT!!!!
-- In the first release, as it is not connected to any server, it could potentially bug if you don't sign out before closing the app, please remember to sign out before closing it!!
+- In the first release, as it is not connected to any server, it could potentially bug if you don't sign out before closing the app, as closing the app will still leave in the cookies. Please remember to sign out before closing it!!

@@ -103,7 +103,7 @@ app.post("/signin", (req, res) => {
 
 //make it logout
 app.post("/logout", (req, res) => {
-  req.session.user_id = null;
+  req.session = null;
   res.redirect("/urls");
 });
 
@@ -181,14 +181,11 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // the ability to reach a website by using its shortURL form
 app.get("/u/:shortURL", (req, res) => {
   const  shortURL = req.params.shortURL;
+  if (!urlDatabase[shortURL]) {
+    return res.send("404 - page not found");
+  } 
   const longurl = urlDatabase[shortURL].longURL;
-  if (!longurl) {
-    res.statusCode = 404;
-    res.write("404 - page not found");
-    res.end();
-  } else {
-    res.redirect(longurl);
-  }
+  res.redirect(longurl);
 });
 
 app.get("/", (req, res) => {
