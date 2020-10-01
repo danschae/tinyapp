@@ -16,14 +16,14 @@ function generateRandomString() {
 // can use bodyparser
 app.use(bodyParser.urlencoded({extended: true}));
 
-// can use cookie parsingdfsdfs
-app.use(cookieParser());
+// // can use cookie parsingdfsdfs
+// app.use(cookieParser());
 
 //implementing cookiesession
 
 app.use(cookieSession({
   name: 'session',
-  keys: ['iamasuperkeyandilikesongs', 'pouet pouet yes spaces are okay why not']
+  keys: ["checkefesfdk", "key2"]
 }))
 
 app.set('view engine', 'ejs');
@@ -82,15 +82,15 @@ const findURL = (obj, id) => {
 app.get("/register", (req, res) => {
   const templatVars = {
     urls: urlDatabase,
-    username: req.cookies["user_id"],
-    users: users[req.cookies["user_id"]]
+    username: req.session.user_id,
+    users: users[req.session.user_id]
   };
-  res.render("sign_in",templatVars)
+  res.render("register",templatVars)
 })
 //get to sign in page
 app.get("/sign_in", (req, res) => {
   const templatVars = {
-    username: req.cookies["user_id"],
+    username: req.session.user_id,
     // users: users[req.cookies["user_id"]]
   };
   res.render("log_in",templatVars)
@@ -113,8 +113,8 @@ app.post("/register", (req,res) => {
     "password": bcrpyt.hashSync(req.body.password, salt)
   };
  
-  res.cookie("user_id", users[generatedId].id);
-  // req.session.users[generatedId].id = username;
+  // res.cookie("user_id", users[generatedId].id);
+  req.session.user_id =  generatedId
   res.redirect("/urls")
   console.log("NEWEST CEHCK *************")
   console.log(users)
@@ -134,7 +134,7 @@ app.post("/sign_in", (req, res) => {
       return res.send("information is incorrect")
     } 
   }
-  res.cookie("user_id", findID(users, req.body.email).id);
+  req.session.user_id = findID(users, req.body.email)
   res.redirect("/urls")
 })
 
@@ -150,18 +150,20 @@ app.post("/signin", (req, res) => {
 
 //make it logout
 app.post("/logout", (req, res) => {
-  res.clearCookie("user_id")
+  req.session.user_id = null
   res.redirect("/urls")
 });
 
 //used to render the index url page
 app.get("/urls", (req, res) => {
-  const newDatabase = findURL(urlDatabase, req.cookies["user_id"]);
+  const newDatabase = findURL(urlDatabase, req.session.user_id);
+  console.log("NEW DATABSE_______________");
+  console.log(newDatabase)
   const templatVars = {
     findURL,
     urls: urlDatabase, 
-    username: req.cookies["user_id"],
-    users: users[req.cookies["user_id"]],
+    username: req.session.user_id,
+    users: users[req.session.user_id],
     newDatabase
   };
     if (!templatVars.username) {
@@ -175,11 +177,11 @@ app.get("/urls", (req, res) => {
 app.get("/urls/new", (req, res) => {
   const templatVars = {
     urls: urlDatabase,
-    username: req.cookies["user_id"],
-    users: users[req.cookies["user_id"]]
+    username: req.session.user_id,
+    users: users[req.session.user_id]
   };
-  const userId = req.cookies["user_id"];
   if (!templatVars.username) {
+    res.send("must sign in first!")
     return res.redirect("/urls")
   }
   res.render("urls_new", templatVars);
@@ -190,7 +192,7 @@ app.post("/urls", (req, res) => {
   let shortened = generateRandomString();
   urlDatabase[shortened] = {
     "longURL": req.body.longURL,
-    "userID" : req.cookies["user_id"]
+    "userID" : req.session.user_id
   }
   console.log("DATABSE HERE =>", urlDatabase)
   res.redirect("/urls");
@@ -203,7 +205,7 @@ app.get("/urls/:shortURL", (req, res) => {
     shortURL: req.params.shortURL,
     longurl: urlDatabase[shortURL].longURL,
     urls: urlDatabase,
-    username: req.cookies["user_id"],
+    username: req.session.user_id,
     users: users
   };
   res.render("urls_show", templatVars);
@@ -212,7 +214,7 @@ app.get("/urls/:shortURL", (req, res) => {
 // the posting method for editing the long url
 app.post("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
-  if (urlDatabase[shortURL]["userID"] === req.cookies["user_id"]){
+  if (urlDatabase[shortURL]["userID"] === req.session.user_id) {
   urlDatabase[shortURL].longURL = req.body.longURL;
   }
   res.redirect("/urls");
@@ -221,7 +223,7 @@ app.post("/urls/:shortURL", (req, res) => {
 // the posting method for deleting a url
 app.post("/urls/:shortURL/delete", (req, res) => {
   const shortURL = req.params.shortURL;
-  if (urlDatabase[shortURL]["userID"] === req.cookies["user_id"]) {
+  if (urlDatabase[shortURL]["userID"] === req.session.user_id) {
   delete urlDatabase[shortURL];
   }
   res.redirect("/urls");
