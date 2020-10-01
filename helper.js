@@ -47,12 +47,12 @@ function generateRandomString() {
   return shortedString;
 }
 
-const getUserByEmail = (email, database) => {
+const getUserByEmail = (emailAddress, database) => {
   for (const user in database) {
-    if (user.email === email) {
-      return user.id
+    if (database[user].email !== emailAddress) {
+      return undefined
     } else {
-      return "user not found!"
+      return database[user].id
     }
   } 
 }
