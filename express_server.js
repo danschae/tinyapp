@@ -11,6 +11,7 @@ const {
   findURL,
   findID,
   checkPassword,
+  checkShortLink
 } = require("./helper"); // list of helper functions, check helper.js in the same folder to see more
 
 
@@ -43,10 +44,9 @@ app.get("/register", (req, res) => {
 });
 
 //get to sign in page
-app.get("/sign_in", (req, res) => {
+app.get("/login", (req, res) => {
   const templatVars = {
     username: req.session.user_id,
-    // users: users[req.cookies["user_id"]]
   };
   res.render("log_in",templatVars);
 });
@@ -74,7 +74,7 @@ app.post("/register", (req,res) => {
 });
 
 //validating log in
-app.post("/sign_in", (req, res) => {
+app.post("/login", (req, res) => {
 
   if (req.body.email.length <= 0 || req.body.password.length <= 0) {
     return res.send("please fill in everything!");
@@ -92,12 +92,12 @@ app.post("/sign_in", (req, res) => {
 });
 
 // the method to login and store a cookie
-app.post("/login", (req, res) => {
+app.post("/registere", (req, res) => {
   res.redirect("/register");
 });
 
 app.post("/signin", (req, res) => {
-  res.redirect("/sign_in");
+  res.redirect("/login");
 });
 
 
@@ -118,7 +118,7 @@ app.get("/urls", (req, res) => {
     newDatabase
   };
   if (!templatVars.username) {
-    return res.redirect("/sign_in");
+    return res.redirect("/login");
   }
   res.render("urls_index", templatVars);
 });
@@ -144,12 +144,15 @@ app.post("/urls", (req, res) => {
     "longURL": req.body.longURL,
     "userID" : req.session.user_id
   };
-  res.redirect("/urls");
+  res.redirect(`/urls/${shortened}`);
 });
 
 //the page for showing and then editing the urls
 app.get("/urls/:shortURL", (req, res) => {
   const shortURL = req.params.shortURL;
+  if (!checkShortLink(shortURL, urlDatabase)) {
+    return res.send("404 - page not found");
+  }
   const templatVars = {
     shortURL: req.params.shortURL,
     longurl: urlDatabase[shortURL].longURL,
@@ -157,6 +160,12 @@ app.get("/urls/:shortURL", (req, res) => {
     username: req.session.user_id,
     users: users[req.session.user_id]
   };
+
+  // if they're not signed in, or the url does not belong to them they can be redirected
+  if (urlDatabase[shortURL].userID !== req.session.user_id){
+    res.redirect("/urls")
+  }
+
   res.render("urls_show", templatVars);
 });
 
@@ -181,6 +190,7 @@ app.post("/urls/:shortURL/delete", (req, res) => {
 // the ability to reach a website by using its shortURL form
 app.get("/u/:shortURL", (req, res) => {
   const  shortURL = req.params.shortURL;
+  
   if (!urlDatabase[shortURL]) {
     return res.send("404 - page not found");
   } 

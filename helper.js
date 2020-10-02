@@ -57,6 +57,16 @@ const getUserByEmail = (emailAddress, database) => {
   } 
 }
 
+//function to check if shortURL is a link
+const checkShortLink = (shortLink, database) => {
+  for (const id in database) {
+    if (shortLink !== id) {
+      return false
+    }
+  }
+  return true;
+};
+
 
 module.exports = {
   checkEmailExists,
@@ -64,5 +74,6 @@ module.exports = {
   findURL,
   findID,
   checkPassword,
-  getUserByEmail
+  getUserByEmail,
+  checkShortLink
 }
