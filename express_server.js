@@ -163,7 +163,7 @@ app.get("/urls/:shortURL", (req, res) => {
 
   // if they're not signed in, or the url does not belong to them they can be redirected
   if (urlDatabase[shortURL].userID !== req.session.user_id){
-    res.redirect("/urls")
+    return res.send("do not have permission to access this page!")
   }
 
   res.render("urls_show", templatVars);
