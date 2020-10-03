@@ -1,70 +1,66 @@
 const bcrpyt = require("bcrypt");
-const salt = bcrpyt.genSaltSync(10);
+
+
 //function to sort through emails
-const checkEmailExists = (obj, email) => {
-  for (const key in obj) {
-    if (obj[key].email === email) {
-      return true
-    } 
+const checkEmailExists = (database, email) => {
+  for (const ID in database) {
+    if (database[ID].email === email) {
+      return true;
     }
-    return false
-  };
+  }
+};
 
 // Function to check password
-const checkPassword = (obj, password) => {
-  for (const key in obj) {
-    if (bcrpyt.compareSync(password, obj[key].password) === true) {
+const checkPassword = (database, password) => {
+  for (const ID in database) {
+    if (bcrpyt.compareSync(password, database[ID].password)) {
       return true;
-    } else {
-      return false;
     }
   }
 };
 
 //function that returns
-const findID = (obj, email) => {
-  for (const key in obj) {
-    if (obj[key].email === email) {
-      return obj[key].id
-    } 
+const findID = (database, email) => {
+  for (const id in database) {
+    if (database[id].email === email) {
+      return database[id].id;
     }
-    return undefined
   }
+};
 
-
-const findURL = (obj, id) => {
-  const emptyObj = {};
-  for (const key in obj) {
-    if (obj[key].userID === id) {
-      emptyObj[key] = obj[key]
-    } 
+// a function used to shift through urls belonging to each user
+const findURL = (database, id) => {
+  const newDatabase = {};
+  for (const ID in database) {
+    if (database[ID].userID === id) {
+      newDatabase[ID] = database[ID];
+    }
   }
-  return emptyObj
-}
+  return newDatabase;
+};
 
-function generateRandomString() {
+// a function to generate a random id for users
+const generateRandomString = () => {
   let shortedString = Math.random().toString(36).substring(2,8);
   return shortedString;
-}
+};
 
+// function to search for a user be email
 const getUserByEmail = (emailAddress, database) => {
   for (const user in database) {
-    if (database[user].email !== emailAddress) {
-      return undefined
-    } else {
-      return database[user].id
+    if (database[user].email === emailAddress) {
+      return database[user].id;
     }
-  } 
-}
+  }
+};
 
 //function to check if shortURL is a link
 const checkShortLink = (shortLink, database) => {
   for (const id in database) {
-    if (shortLink !== id) {
-      return false
+    if (shortLink === id) {
+      return true;
     }
   }
-  return true;
 };
 
 
@@ -76,4 +72,4 @@ module.exports = {
   checkPassword,
   getUserByEmail,
   checkShortLink
-}
+};
